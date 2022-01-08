@@ -1,5 +1,6 @@
 import combine from "../../Core/combine.js";
 import defaultValue from "../../Core/defaultValue.js";
+import defined from "../../Core/defined.js";
 
 /**
  * The batch texture stage is responsible for setting up the batch texture for the primitive.
@@ -30,6 +31,11 @@ BatchTexturePipelineStage.process = function (
   var batchTextureUniforms = {};
 
   var model = renderResources.model;
+
+  // XXX TODO Verify this
+  if (!defined(model.featureTables)) {
+    return;
+  }
   var featureTable = model.featureTables[model.featureTableId];
 
   // Number of features in the feature table.

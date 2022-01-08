@@ -787,6 +787,15 @@ function loadMaterial(loader, gltf, gltfMaterial, supportedImageFormats) {
 }
 
 // for EXT_mesh_features
+/**
+ * @brief Creates a {@link FeatureIdAttribute} from the given input.
+ *
+ * @param {Object} featureIds The feature ID attribute object from the JSON input,
+ * as defined in `featureIdAttribute.schema.json`
+ * @param {Number} propertyTableId The number (index) of the property table, or
+ * undefined if the feature ID is not associated with a property table.
+ * @returns The {@link FeatureIdAttribute}.
+ */
 function loadFeatureIdAttribute(featureIds, propertyTableId) {
   var featureIdAttribute = new FeatureIdAttribute();
   featureIdAttribute.propertyTableId = propertyTableId;
@@ -810,6 +819,40 @@ function loadFeatureIdAttributeLegacy(gltfFeatureIdAttribute, featureTableId) {
   return featureIdAttribute;
 }
 
+/**
+ * @brief Returns the specified array element, if it exists.
+ *
+ * If the given array is `undefined` or the given index is not
+ * smaller than the array length, then `undefined` is returned.
+ * Otherwise, the specified array element is returned.
+ *
+ * @param {Array} array The array
+ * @param {Number} index The index
+ * @returns The result
+ */
+function getOptional(array, index) {
+  if (!defined(array)) {
+    return undefined;
+  }
+  if (index >= array.length) {
+    return undefined;
+  }
+  return array[index];
+}
+
+/**
+ * @brief Load a {@link FeatureIdTexture} from the given input.
+ *
+ * @param {Object} loader The {@link GltfLoader}.
+ * @param {Object} gltf The glTF as it was read from the JSON input.
+ * @param {Object} gltfFeatureIdTexture The feature ID texture JSON
+ * input, as defined in `featureIdTexture.schema.json`.
+ * @param {Number} propertyTableId The property table ID (index),
+ * or undefined if the feature IDs are not associated with a
+ * property table.
+ * @param {Object} supportedImageFormats The {@link SupportedImageFormats}.
+ * @returns The {@link FeatureIdTexture}.
+ */
 function loadFeatureIdTexture(
   loader,
   gltf,
@@ -989,9 +1032,11 @@ function loadPrimitiveMetadata(
   // Feature ID Attributes
   var featureIdAttributesLength = featureIdAttributes.length;
   for (i = 0; i < featureIdAttributesLength; ++i) {
-    primitive.featureIdAttributes.push(
-      loadFeatureIdAttribute(featureIdAttributes[i], propertyTablesArray[i])
+    var primitiveFeatureIdAttribute = loadFeatureIdAttribute(
+      featureIdAttributes[i],
+      getOptional(propertyTablesArray, i)
     );
+    primitive.featureIdAttributes.push(primitiveFeatureIdAttribute);
   }
 
   // Feature ID Textures
@@ -1002,7 +1047,7 @@ function loadPrimitiveMetadata(
         loader,
         gltf,
         featureIdTextures[i],
-        propertyTablesArray[i],
+        getOptional(propertyTablesArray, i),
         supportedImageFormats
       )
     );
@@ -1139,16 +1184,12 @@ function loadInstances(loader, gltf, nodeExtensions, frameState) {
 function loadInstanceMetadata(instances, metadataExtension) {
   // feature IDs are required in EXT_mesh_features
   var featureIdAttributes = metadataExtension.featureIds;
-  var propertyTables = defined(metadataExtension.propertyTables)
-    ? metadataExtension.propertyTables
-    : [];
-
+  var propertyTablesArray = metadataExtension.propertyTables;
   var featureIdAttributesLength = featureIdAttributes.length;
   for (var i = 0; i < featureIdAttributesLength; i++) {
     var featureIds = featureIdAttributes[i];
-    var propertyTableId = propertyTables[i];
     instances.featureIdAttributes.push(
-      loadFeatureIdAttribute(featureIds, propertyTableId)
+      loadFeatureIdAttribute(featureIds, getOptional(propertyTablesArray, i))
     );
   }
 }

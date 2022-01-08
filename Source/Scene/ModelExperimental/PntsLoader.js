@@ -518,7 +518,6 @@ function makeComponents(loader, context) {
 
   if (defined(parsedContent.batchIds)) {
     var featureIdAttribute = new FeatureIdAttribute();
-    featureIdAttribute.propertyTableId = 0;
     featureIdAttribute.setIndex = 0;
     primitive.featureIdAttributes = [featureIdAttribute];
   }

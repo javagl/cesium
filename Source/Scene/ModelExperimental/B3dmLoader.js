@@ -324,7 +324,6 @@ function processNode(node) {
       if (defined(featureIdVertexAttribute)) {
         featureIdVertexAttribute.setIndex = 0;
         var featureIdAttribute = new FeatureIdAttribute();
-        featureIdAttribute.propertyTableId = 0;
         featureIdAttribute.setIndex = 0;
         primitive.featureIdAttributes.push(featureIdAttribute);
       }

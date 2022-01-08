@@ -129,7 +129,12 @@ function processPickTexture(renderResources, primitive, instances) {
     featureTableId = featureIdAttribute.propertyTableId;
   }
 
-  var featureTable = model.featureTables[featureTableId];
+  // XXX TODO Verify this...
+  // If the feature ID is not associated with a property table
+  // (aka feature table), then nothing has to be done here.
+  if (!defined(featureTableId)) {
+    return;
+  }
 
   var shaderBuilder = renderResources.shaderBuilder;
   shaderBuilder.addUniform(
@@ -138,6 +143,7 @@ function processPickTexture(renderResources, primitive, instances) {
     ShaderDestination.FRAGMENT
   );
 
+  var featureTable = model.featureTables[featureTableId];
   var batchTexture = featureTable.batchTexture;
   var pickingUniforms = {
     model_pickTexture: function () {
